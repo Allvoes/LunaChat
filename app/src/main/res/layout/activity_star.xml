@@ -4,14 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".StarActivity">
 
     <Button
-        android:id="@+id/reg_btn"
-        android:layout_width="match_parent"
+        android:id="@+id/log_btn"
+        android:layout_width="265dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="234dp"
-        android:text="NEED NEW ACCOUNT?" />
+        android:layout_marginBottom="117dp"
+        android:background="@color/colorAccent"
+        android:text="ALREADY HAVE ACCOUNT?"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textColorLink="@color/colorAccent" />
+
+    <Button
+        android:id="@+id/reg_btn"
+        android:layout_width="265dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="61dp"
+        android:background="@color/common_google_signin_btn_text_dark_default"
+        android:text="NEED A NEW ACCOUNT?" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="199dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="186dp"
+        android:text="Wellcome to Luna Chat app"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 </RelativeLayout>

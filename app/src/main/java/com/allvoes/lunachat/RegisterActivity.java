@@ -1,11 +1,13 @@
 package com.allvoes.lunachat;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,17 +22,27 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout reg_name,reg_email,reg_pass;
     private Button reg_acc_btn;
     private FirebaseAuth mAuth;
+    private Toolbar mtoolbar;
+    private Dialog mdialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+
+
         //methor
         reg_name = (TextInputLayout)findViewById(R.id.Reg_display_name);
         reg_email = (TextInputLayout)findViewById(R.id.Reg_email);
         reg_pass = (TextInputLayout)findViewById(R.id.Reg_password);
         reg_acc_btn = (Button)findViewById(R.id.Reg_acc_btn);
+        mtoolbar = (Toolbar)findViewById(R.id.register_toolbar);
+        setSupportActionBar(mtoolbar);
+        getSupportActionBar().setTitle("Create Account");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         reg_acc_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,5 +76,26 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // todo: goto back activity from here
+
+                Intent intent = new Intent(RegisterActivity.this, StarActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(intent);
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

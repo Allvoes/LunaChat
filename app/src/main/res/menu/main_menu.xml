@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item
+        android:id="@+id/Main_setting"
+        android:title="Account Setting" />
+    <item
+        android:id="@+id/Main_all_btn"
+        android:title="All user" />
+    <item
+        android:id="@+id/btn_log_out"
+        android:title="@string/log_out" />
 </menu>

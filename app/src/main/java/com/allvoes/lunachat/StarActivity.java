@@ -8,15 +8,16 @@ import android.widget.Button;
 
 public class StarActivity extends AppCompatActivity {
 
-    Button mbtn;
+    Button mreg_btn,mlog_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_star);
 
-        mbtn = (Button)findViewById(R.id.reg_btn);
+        mreg_btn = (Button)findViewById(R.id.reg_btn);
+        mlog_btn = (Button)findViewById(R.id.log_btn);
 
-        mbtn.setOnClickListener(new View.OnClickListener() {
+        mreg_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent thisIntent = new Intent(StarActivity.this,RegisterActivity.class);
@@ -24,7 +25,19 @@ public class StarActivity extends AppCompatActivity {
                 finish();
             }
         });
+        mlog_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent thisIntent = new Intent(StarActivity.this,LoginActivity.class);
+                startActivity(thisIntent);
+                finish();
+            }
+        });
+
 
     }
+
+
+
 
 }
