@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">LunaChat</string>
+    <string name="main_activity">Main Activity</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="displayname">DisplayName</string>
+    <string name="register">Register</string>
 </resources>
