@@ -1,6 +1,9 @@
 package com.allvoes.lunachat;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -10,10 +13,15 @@ import android.view.MenuItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ChatFragment.OnFragmentInteractionListener{
 
     private FirebaseAuth mAuth;
     private Toolbar mtoolbar;
+    private ViewPager mViewPaper;
+    private SectionsPaperAdapter mSectionAdapter;
+
+    private TabLayout mTablayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +29,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
-        mtoolbar = (Toolbar)findViewById(R.id.register_toolbar);
+
+        mtoolbar = (Toolbar)findViewById(R.id.main_toolbar);
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setTitle("Luna Chat");
+
+
+
+        mViewPaper = (ViewPager)findViewById(R.id.tabpage);
+        mSectionAdapter = new SectionsPaperAdapter(getSupportFragmentManager());
+        mViewPaper.setAdapter(mSectionAdapter);
+
+        mTablayout = (TabLayout)findViewById(R.id.main_tabs);
+        mTablayout.setupWithViewPager(mViewPaper);
+
     }
 
 
@@ -75,5 +94,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        
     }
 }

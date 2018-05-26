@@ -1,15 +1,18 @@
 package com.allvoes.lunachat;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,13 +26,16 @@ public class RegisterActivity extends AppCompatActivity {
     private Button reg_acc_btn;
     private FirebaseAuth mAuth;
     private Toolbar mtoolbar;
-    private Dialog mdialog;
+    private ProgressDialog mdialog;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        mdialog = new ProgressDialog(this);
+
 
 
 
@@ -51,7 +57,15 @@ public class RegisterActivity extends AppCompatActivity {
                 String email = reg_email.getEditText().getText().toString();
                 String pass = reg_pass.getEditText().getText().toString();
 
-                registerUser(display_name,email,pass);
+                if(!TextUtils.isEmpty(display_name)||!TextUtils.isEmpty(email)||!TextUtils.isEmpty(pass)){
+                    mdialog.setTitle("Register User");
+                    mdialog.setMessage("Please wait!");
+                    mdialog.setCanceledOnTouchOutside(false);
+                    mdialog.show();
+                    registerUser(display_name,email,pass);
+                }
+
+
             }
         });
 
@@ -66,12 +80,14 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-
+                    mdialog.dismiss();
                     Intent thisIntent = new Intent(RegisterActivity.this,MainActivity.class);
+                    thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(thisIntent);
                     finish();
                 }
                 else {
+                    mdialog.hide();
                     Toast.makeText(RegisterActivity.this,"u got some Error check registerUser!!!",Toast.LENGTH_LONG).show();
                 }
             }
