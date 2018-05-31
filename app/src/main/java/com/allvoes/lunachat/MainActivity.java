@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         mTablayout = (TabLayout)findViewById(R.id.main_tabs);
         mTablayout.setupWithViewPager(mViewPaper);
 
+
+
+
+
     }
 
 
@@ -92,8 +96,15 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
 
 
         }
+        if (item.getItemId()== R.id.Main_setting){
+            Intent i = new Intent(MainActivity.this,SettingsActivity.class);
+            startActivity(i);
+
+        }
 
         return true;
+
+
     }
 
     @Override

@@ -48,4 +48,5 @@ class SectionsPaperAdapter extends FragmentPagerAdapter  {
         }
 
     }
+
 }
