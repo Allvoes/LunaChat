@@ -20,6 +20,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthEmailException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -82,45 +87,68 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void registerUser(final String display_name, String email, String pass) {
 
+
         mAuth.createUserWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
 
-                    FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
-                    String uid = current_user.getUid();
-                    mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(uid);
-                    HashMap<String, String> usermap = new HashMap<>();
-                    usermap.put("name", display_name);
-                    usermap.put("status","Hellon't");
-                    usermap.put("image","Default");
-                    usermap.put("Thumb_image","Default");
 
-                    mDatabase.setValue(usermap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            mdialog.dismiss();
-                            Intent thisIntent = new Intent(RegisterActivity.this,MainActivity.class);
-                            thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(thisIntent);
-                            finish();
-                        }
-                    });
+                if (task.isSuccessful()) {
+
+
+                        FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
+                        String uid = current_user.getUid();
+                        mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(uid);
+                        HashMap<String, String> usermap = new HashMap<>();
+                        usermap.put("name", display_name);
+                        usermap.put("status", "Hellon't");
+                        usermap.put("image", "Default");
+                        usermap.put("Thumb_image", "Default");
+
+                        mDatabase.setValue(usermap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                mdialog.dismiss();
+                                Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(thisIntent);
+                                finish();
+                            }
+                        });
+
 
 
 
 
                 }
                 else {
+                    String err ="";
+                    try {
+                        throw task.getException();
+                    }catch (FirebaseAuthWeakPasswordException e) {
+                        err = "Weak Password!!!";
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                        err = "Invalid Email !!!";
+                    } catch (FirebaseAuthUserCollisionException e) {
+                        err = "Existing account!!!";
+                    } catch (Exception e) {
+                        err = "Unknow Error , try late!";
+                    }
                     mdialog.hide();
-                    Toast.makeText(RegisterActivity.this,"u got some Error check registerUser!!!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, err, Toast.LENGTH_LONG).show();
+
                 }
             }
+
+
+
         });
 
 
 
     }
+
+
 
 
     @Override

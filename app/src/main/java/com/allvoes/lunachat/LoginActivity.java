@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -50,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 String Email = mEmail.getEditText().getText().toString();
                 String Password = mPassword.getEditText().getText().toString();
                 if(!TextUtils.isEmpty(Email)||!TextUtils.isEmpty(Password)){
-                    mdialog.setTitle("Register User");
+                    mdialog.setTitle("Login User");
                     mdialog.setMessage("Please wait!");
                     mdialog.setCanceledOnTouchOutside(false);
                     mdialog.show();
@@ -77,8 +79,21 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }else {
+                    String error = "";
+
+                    try {
+                        throw task.getException();
+                    } catch (FirebaseAuthInvalidUserException e) {
+                        error = "Invalid Email!";
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                        error = "Invalid Password!";
+                    } catch (Exception e) {
+                        error = "Default error!";
+                        e.printStackTrace();
+                    }
                     mdialog.hide();
-                    Toast.makeText(LoginActivity.this,"Cannot Sign in , try later!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+
                 }
             }
         });

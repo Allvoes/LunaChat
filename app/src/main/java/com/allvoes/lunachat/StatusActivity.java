@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -26,9 +28,29 @@ public class StatusActivity extends AppCompatActivity {
     private Button  mSave;
     private TextInputLayout mstatus;
     private ProgressDialog mdialog;
+    private Toolbar mToolbar;
 
     private DatabaseReference mDatabase;
     private FirebaseUser Current_User;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // todo: goto back activity from here
+
+                Intent intent = new Intent(StatusActivity.this, SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(intent);
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +58,20 @@ public class StatusActivity extends AppCompatActivity {
 
         mstatus = (TextInputLayout)findViewById(R.id.Status_text);
         mSave = (Button)findViewById(R.id.Status_btn);
+        String status_value = getIntent().getStringExtra("status_value");
+
+        mstatus.getEditText().setText(status_value);
+
+
+        mdialog = new ProgressDialog(this);
+
+
+
+        mToolbar = (Toolbar)findViewById(R.id.status_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Change Status");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Current_User = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -46,44 +82,36 @@ public class StatusActivity extends AppCompatActivity {
         mSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mdialog.setTitle("Change status");
+                mdialog.setMessage("Please wait!");
+                mdialog.setCanceledOnTouchOutside(false);
+                mdialog.show();
 
-                mDatabase.addValueEventListener(new ValueEventListener() {
+                String statuss = mstatus.getEditText().getText().toString();
+
+                mDatabase.child("status").setValue(statuss).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                        mdialog.setTitle("Change status");
-                        mdialog.setMessage("Please wait!");
-                        mdialog.setCanceledOnTouchOutside(false);
-                        mdialog.show();
+                        if (task.isSuccessful()){
+                            mdialog.dismiss();
+                            Intent intent = new Intent(StatusActivity.this, SettingsActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION
+                                    | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
 
+                        }
+                        else {
+                            Toast.makeText(StatusActivity.this,"error try later!",Toast.LENGTH_LONG).show();
+                        }
 
-
-                        mDatabase.child("status").setValue(mstatus).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-
-
-                                mdialog.dismiss();
-                                Intent intent = new Intent(StatusActivity.this, MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION| Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                finish();
-
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(StatusActivity.this,"Error try later!",Toast.LENGTH_LONG).show();
                     }
                 });
-
-
-
             }
         });
+
+
 
 
 
