@@ -88,16 +88,17 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         super.onOptionsItemSelected(item);
 
         if(item.getItemId()== R.id.btn_log_out){
-
             FirebaseAuth.getInstance().signOut();
-
             send_to_start();
-
-
-
         }
         if (item.getItemId()== R.id.Main_setting){
             Intent i = new Intent(MainActivity.this,SettingsActivity.class);
+            startActivity(i);
+
+        }
+
+        if (item.getItemId()== R.id.Main_all_btn){
+            Intent i = new Intent(MainActivity.this,UsersActivity.class);
             startActivity(i);
 
         }

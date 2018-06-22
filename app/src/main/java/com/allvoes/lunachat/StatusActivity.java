@@ -55,28 +55,18 @@ public class StatusActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status);
-
         mstatus = (TextInputLayout)findViewById(R.id.Status_text);
         mSave = (Button)findViewById(R.id.Status_btn);
         String status_value = getIntent().getStringExtra("status_value");
-
         mstatus.getEditText().setText(status_value);
-
-
         mdialog = new ProgressDialog(this);
-
-
-
         mToolbar = (Toolbar)findViewById(R.id.status_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Change Status");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         Current_User = FirebaseAuth.getInstance().getCurrentUser();
-
         String Current_uid = Current_User.getUid();
-
         mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(Current_uid);
 
         mSave.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +93,7 @@ public class StatusActivity extends AppCompatActivity {
 
                         }
                         else {
+                            mdialog.dismiss();
                             Toast.makeText(StatusActivity.this,"error try later!",Toast.LENGTH_LONG).show();
                         }
 

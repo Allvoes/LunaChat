@@ -39,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Toolbar mtoolbar;
     private ProgressDialog mdialog;
     private DatabaseReference mDatabase;
+    private FirebaseUser mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mdialog = new ProgressDialog(this);
-
-
-
+        mAuth = FirebaseAuth.getInstance();
 
         //methor
         reg_name = (TextInputLayout)findViewById(R.id.Reg_display_name);
@@ -81,14 +80,14 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
 
-        mAuth = FirebaseAuth.getInstance();
+
 
     }
 
     private void registerUser(final String display_name, String email, String pass) {
 
 
-        mAuth.createUserWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
@@ -96,36 +95,30 @@ public class RegisterActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
 
 
-                        FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
-                        String uid = current_user.getUid();
-                        mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(uid);
-                        HashMap<String, String> usermap = new HashMap<>();
-                        usermap.put("name", display_name);
-                        usermap.put("status", "Hellon't");
-                        usermap.put("image", "Default");
-                        usermap.put("Thumb_image", "Default");
+                    FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
+                    String uid = current_user.getUid();
+                    mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(uid);
+                    HashMap<String, String> usermap = new HashMap<>();
+                    usermap.put("name", display_name);
+                    usermap.put("status", "Hellon't");
+                    usermap.put("image", "Default");
+                    usermap.put("Thumb_image", "Default");
 
-                        mDatabase.setValue(usermap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                mdialog.dismiss();
-                                Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                                thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(thisIntent);
-                                finish();
-                            }
-                        });
-
-
-
-
-
-                }
-                else {
-                    String err ="";
+                    mDatabase.setValue(usermap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mdialog.dismiss();
+                            Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                            thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(thisIntent);
+                            finish();
+                        }
+                    });
+                } else {
+                    String err = "";
                     try {
                         throw task.getException();
-                    }catch (FirebaseAuthWeakPasswordException e) {
+                    } catch (FirebaseAuthWeakPasswordException e) {
                         err = "Weak Password!!!";
                     } catch (FirebaseAuthInvalidCredentialsException e) {
                         err = "Invalid Email !!!";
@@ -139,18 +132,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                 }
             }
-
-
-
         });
-
-
-
     }
-
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
