@@ -56,8 +56,8 @@
         android:text="DisplayName"
         android:textColor="@android:color/background_light"
         android:textSize="24sp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Settings_image" />
 
     <TextView
@@ -92,6 +92,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/colorAccent"
+        android:elevation="0dp"
         android:text="CHANGE STATUS"
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toTopOf="@+id/guideline4"
