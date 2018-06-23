@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:parentActivityName=".StarActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,16 +24,20 @@
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".StarActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".StatusActivity" />
+        <activity android:name=".LoginActivity"
+            android:parentActivityName=".StarActivity"/>
+        <activity android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".StatusActivity"
+            android:parentActivityName=".SettingsActivity"/>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
             android:name=".UsersActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".ProfileActivity"
+            android:parentActivityName=".UsersActivity"></activity>
     </application>
 
 </manifest>

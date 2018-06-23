@@ -85,10 +85,7 @@ public class StatusActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()){
                             mdialog.dismiss();
-                            Intent intent = new Intent(StatusActivity.this, SettingsActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION
-                                    | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+
                             finish();
 
                         }
