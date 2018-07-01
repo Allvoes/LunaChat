@@ -15,11 +15,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     private Toolbar mtoolbar;
     private ProgressDialog mdialog;
     private FirebaseAuth mAuth;
+    private DatabaseReference mdatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         Log_btn = (Button)findViewById(R.id.Log_acc_btn);
         mdialog = new ProgressDialog(this);
         mAuth = FirebaseAuth.getInstance();
+        mdatabase = FirebaseDatabase.getInstance().getReference().child("User");
 
         mtoolbar = (Toolbar)findViewById(R.id.Login_toolbar);
         setSupportActionBar(mtoolbar);
@@ -73,11 +80,20 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    mdialog.dismiss();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
+                    String device_token = FirebaseInstanceId.getInstance().getToken();
+                    String uid = mAuth.getCurrentUser().getUid();
+
+                    mdatabase.child(uid).child("TokenId").setValue(device_token).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            mdialog.dismiss();
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+
                 }else {
                     String error = "";
 

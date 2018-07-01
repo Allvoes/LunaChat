@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 
@@ -38,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Toolbar mtoolbar;
     private ProgressDialog mdialog;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase,mdatabase;
     private FirebaseUser mCurrentUser;
 
     @Override
@@ -48,6 +50,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         mdialog = new ProgressDialog(this);
         mAuth = FirebaseAuth.getInstance();
+        mdatabase = FirebaseDatabase.getInstance().getReference().child("User");
+
 
         //methor
         reg_name = (TextInputLayout)findViewById(R.id.Reg_display_name);
@@ -55,6 +59,8 @@ public class RegisterActivity extends AppCompatActivity {
         reg_pass = (TextInputLayout)findViewById(R.id.Reg_password);
         reg_acc_btn = (Button)findViewById(R.id.Reg_acc_btn);
         mtoolbar = (Toolbar)findViewById(R.id.register_toolbar);
+
+
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setTitle("Create Account");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -107,11 +113,19 @@ public class RegisterActivity extends AppCompatActivity {
                     mDatabase.setValue(usermap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            mdialog.dismiss();
-                            Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                            thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(thisIntent);
-                            finish();
+                            String device_token = FirebaseInstanceId.getInstance().getToken();
+                            String uid = FirebaseAuth.getInstance().getUid();
+                            mdatabase.child(uid).child("TokenId").setValue(device_token).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    mdialog.dismiss();
+                                    Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                                    thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(thisIntent);
+                                    finish();
+                                }
+                            });
+
                         }
                     });
                 } else {
