@@ -13,6 +13,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".Luna">
+
+
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+        <meta-data android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+        <meta-data android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+
+        <service
+            android:name=".FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
         <activity android:name=".MainActivity"
             android:parentActivityName=".StarActivity">
             <intent-filter>
@@ -38,7 +55,12 @@
             android:name=".UsersActivity"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ProfileActivity"
-            android:parentActivityName=".UsersActivity"></activity>
+            android:parentActivityName=".UsersActivity">
+            <intent-filter>
+                <action android:name="com.allvoes.Luna_FRIEND_REQUEST_NOTIFICATION"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

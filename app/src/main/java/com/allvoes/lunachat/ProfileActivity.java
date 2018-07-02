@@ -190,8 +190,8 @@ public class ProfileActivity extends AppCompatActivity {
                                     public void onSuccess(Void aVoid) {
 
                                         HashMap<String ,String> notifications = new HashMap<>();
-                                        notifications.put("From :", mUid.getUid());
-                                        notifications.put("Type :","Friend Request");
+                                        notifications.put("From", mUid.getUid());
+                                        notifications.put("Type","Friend Request");
 
 
                                         mCloudMess.child(user_uid).push().setValue(notifications).addOnSuccessListener(new OnSuccessListener<Void>() {
