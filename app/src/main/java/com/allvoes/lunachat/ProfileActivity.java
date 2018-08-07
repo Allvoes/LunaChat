@@ -4,8 +4,10 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.media.Image;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,6 +29,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -37,7 +40,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private String mcurrent_state;
 
-    private DatabaseReference mFriendrequest,mUserDatabase,mFriends,mCloudMess;
+    private DatabaseReference mFriendrequest,mUserDatabase,mFriends,mCloudMess,mRootRef;
+    private FirebaseAuth mAuth;
     private ProgressDialog mdialog;
     private FirebaseUser mUid;
 
@@ -45,17 +49,14 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        final String user_uid = getIntent().getStringExtra("user_id");
 
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(user_uid);
-        mFriendrequest = FirebaseDatabase.getInstance().getReference().child("friend_ref");
-        mFriends = FirebaseDatabase.getInstance().getReference().child("Friend");
-        mCloudMess = FirebaseDatabase.getInstance().getReference().child("notifications");
-
-
-        mUid = FirebaseAuth.getInstance().getCurrentUser();
-
-
+        final String user_uid;
+        String data = getIntent().getStringExtra("user_id");
+        if(data == null){
+            user_uid= getIntent().getStringExtra("from_user_id");
+        }else{
+            user_uid = getIntent().getStringExtra("user_id");
+        }
 
         mImages = (ImageView)findViewById(R.id.Profile_image);
         mDisplayname = (TextView)findViewById(R.id.Profile_displayname);
@@ -63,11 +64,20 @@ public class ProfileActivity extends AppCompatActivity {
         mTotalfriend  =(TextView)findViewById(R.id.Profile_totalfriend);
         mSendbtn=(Button)findViewById(R.id.Profile_sendbtn);
         mdelinebtn=(Button)findViewById(R.id.profile_sendbtn2);
-
-
         mcurrent_state = "no_friend";
-
         mdelinebtn.setVisibility(View.INVISIBLE);
+
+
+
+
+
+        mUid = FirebaseAuth.getInstance().getCurrentUser();
+
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(user_uid);
+        mFriendrequest = FirebaseDatabase.getInstance().getReference().child("friend_ref");
+        mFriends = FirebaseDatabase.getInstance().getReference().child("Friend");
+        mCloudMess = FirebaseDatabase.getInstance().getReference().child("notifications");
 
 
         mdialog = new ProgressDialog(this);
@@ -82,7 +92,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
-
+        //----------------------------GetData--------------------------------------------------
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -93,21 +103,19 @@ public class ProfileActivity extends AppCompatActivity {
 
                 mDisplayname.setText(display_name);
                 mStatus.setText(display_status);
+
                 Picasso.get().load(display_image).placeholder(R.drawable.default_avatar).into(mImages);
 
-                //----------------------------btn State-------------------------------
-
-
                 mdialog.dismiss();
+
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+
+
             }
         });
-
-
-
-
+        //----------------------------Default button state ------------------------------------
         mFriendrequest.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -117,37 +125,47 @@ public class ProfileActivity extends AppCompatActivity {
                         if(dataSnapshot.hasChild(user_uid)){
                             String rep_data = dataSnapshot.child(user_uid).child("request_type").getValue().toString();
                             if(rep_data.equals("received")){
+
                                 mcurrent_state="req_recevied";
                                 mSendbtn.setText("Accept Friend Request");
                                 mdelinebtn.setVisibility(View.VISIBLE);
+
                             }else if(rep_data.equals("sent")){
+
                                 mcurrent_state="req_send";
                                 mSendbtn.setText("Cancel Send Request");
-                            }
 
+                            }
                         }else if (!dataSnapshot.exists()){
+
                             mFriends.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                                     mFriends.child(mUid.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                                             if(dataSnapshot.hasChild(user_uid)){
+
                                                 mcurrent_state="friend";
                                                 mSendbtn.setText("Unfriend");
                                                 mdelinebtn.setVisibility(View.INVISIBLE);
+
                                             }else if(!dataSnapshot.exists()){
+
                                                 mcurrent_state="no_friend";
                                                 mSendbtn.setText("Send Friend Request");
                                                 mdelinebtn.setVisibility(View.INVISIBLE);
+
                                             }
                                         }
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                         }
                                     });
                                 }
-
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -157,167 +175,138 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-
-
-
-
-
-
-
-
-
+        //----------------------------On-Click button state------------------------------------
         mSendbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //----------------------------------Send Friend Request-----------------------------------
                 if(mcurrent_state.equals("no_friend")){
 
-                    mFriendrequest.child(mUid.getUid()).child(user_uid).child("request_type").setValue("sent").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    DatabaseReference newNotifi = mRootRef.child("notifications").child(user_uid).push();
+                    String newNotifiID = newNotifi.getKey();
+
+                    HashMap<String ,String> notificationData = new HashMap<>();
+                    notificationData.put("From", mUid.getUid());
+                    notificationData.put("Type","Friend Request");
+
+                    Map sendMap = new HashMap();
+                    sendMap.put("friend_ref/"+ mUid.getUid() +"/"+ user_uid +"/request_type","sent");
+                    sendMap.put("friend_ref/"+ user_uid +"/"+ mUid.getUid() +"/request_type","received");
+                    sendMap.put("notifications/"+ user_uid +"/"+ newNotifiID,notificationData);
+
+                    mRootRef.updateChildren(sendMap, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onComplete(@NonNull final Task<Void> task) {
-                            if(task.isSuccessful()){
-                                mFriendrequest.child(user_uid).child(mUid.getUid()).child("request_type").setValue("received").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            if(databaseError!=null){
 
-                                        HashMap<String ,String> notifications = new HashMap<>();
-                                        notifications.put("From", mUid.getUid());
-                                        notifications.put("Type","Friend Request");
+                                Toast.makeText(ProfileActivity.this,"error! restart app and try again!",Toast.LENGTH_LONG).show();
 
-
-                                        mCloudMess.child(user_uid).push().setValue(notifications).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                mdelinebtn.setVisibility(View.INVISIBLE);
-                                                mcurrent_state="req_send";
-                                                mSendbtn.setText("Cancel Send Request");
-                                                Toast.makeText(ProfileActivity.this,"Request Send Success!",Toast.LENGTH_LONG).show();
-                                            }
-
-                                        });
-
-
-
-                                    }
-                                });
                             }else {
-                                Toast.makeText(ProfileActivity.this,"Request send fail!!!",Toast.LENGTH_LONG).show();
+
+                                mdelinebtn.setVisibility(View.INVISIBLE);
+                                mcurrent_state="req_send";
+                                mSendbtn.setText("Cancel Send Request");
+                                Toast.makeText(ProfileActivity.this,"Request Send Success!",Toast.LENGTH_LONG).show();
+
                             }
                         }
                     });
-
-                    }
+                }
                 //--------------------------------Recevied Friend Request------------------
                 if(mcurrent_state.equals("req_send")){
 
-                    mFriendrequest.child(mUid.getUid()).child(user_uid).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    Map DeclineMap = new HashMap();
+                    DeclineMap.put("friend_ref/"+ mUid.getUid() +"/"+ user_uid +"/request_type",null);
+                    DeclineMap.put("friend_ref/"+ user_uid +"/"+ mUid.getUid() +"/request_type",null);
+
+                    mRootRef.updateChildren(DeclineMap, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            mFriendrequest.child(user_uid).child(mUid.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-
-                                    
-
-                                    mdelinebtn.setVisibility(View.INVISIBLE);
-                                    mcurrent_state="no_friend";
-                                    mSendbtn.setText("Send Friend Request");
-
-
-
-                                }
-                            });
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            if(databaseError!=null){
+                                Toast.makeText(ProfileActivity.this,"error! restart app and try again!",Toast.LENGTH_LONG).show();
+                            }else {
+                                mdelinebtn.setVisibility(View.INVISIBLE);
+                                mcurrent_state="no_friend";
+                                mSendbtn.setText("Send Friend Request");
+                            }
                         }
                     });
+                    //*************************************************************************
                 }
                 //----------------------------Accept Request-------------------------------
                 if(mcurrent_state.equals("req_recevied")){
 
                     final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
+                    Map AcceptMap = new HashMap();
+                    AcceptMap.put("Friend/"+ mUid.getUid()+"/"+user_uid+"/"+"Date",currentDate);
+                    AcceptMap.put("Friend/"+ user_uid+"/"+mUid.getUid()+"/"+"Date",currentDate);
+                    AcceptMap.put("friend_ref/"+ mUid.getUid() +"/"+ user_uid +"/request_type",null);
+                    AcceptMap.put("friend_ref/"+ user_uid +"/"+ mUid.getUid() +"/request_type",null);
 
-                    mFriends.child(mUid.getUid()).child(user_uid).setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mRootRef.updateChildren(AcceptMap, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            mFriends.child(user_uid).child(mUid.getUid()).setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    mFriendrequest.child(mUid.getUid()).child(user_uid).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            mFriendrequest.child(user_uid).child(mUid.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-
-                                                    mdelinebtn.setVisibility(View.INVISIBLE);
-                                                    mcurrent_state="friend";
-                                                    mSendbtn.setText("Unfriend");
-
-
-
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                }
-                            });
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            if(databaseError!=null){
+                                Toast.makeText(ProfileActivity.this,"error! restart app and try again!",Toast.LENGTH_LONG).show();
+                            }else {
+                                mdelinebtn.setVisibility(View.INVISIBLE);
+                                mcurrent_state="friend";
+                                mSendbtn.setText("Unfriend");
+                            }
                         }
                     });
                 }
                 //-------------------------------Unfriend--------------------------------------------
                 if(mcurrent_state.equals("friend")){
-                    mFriends.child(mUid.getUid()).child(user_uid).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                    Map Unfriend = new HashMap();
+                    Unfriend.put("Friend/"+ mUid.getUid()+"/"+user_uid,null);
+                    Unfriend.put("Friend/"+ user_uid+"/"+mUid.getUid(),null);
+
+                    mRootRef.updateChildren(Unfriend, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            mFriends.child(user_uid).child(mUid.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-
-                                    mcurrent_state="no_friend";
-                                    mSendbtn.setText("send friend request");
-
-                                }
-                            });
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            if(databaseError!=null){
+                                Toast.makeText(ProfileActivity.this,"error! restart app and try again!",Toast.LENGTH_LONG).show();
+                            }else {
+                                mcurrent_state="no_friend";
+                                mSendbtn.setText("send friend request");
+                            }
                         }
                     });
                 }
             }
-
         });
-
         mdelinebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFriendrequest.child(mUid.getUid()).child(user_uid).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                Map deline = new HashMap();
+                deline.put("friend_ref/"+ mUid.getUid() +"/"+ user_uid +"/request_type",null);
+                deline.put("friend_ref/"+ user_uid +"/"+ mUid.getUid() +"/request_type",null);
+
+                mRootRef.updateChildren(deline, new DatabaseReference.CompletionListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        mFriendrequest.child(user_uid).child(mUid.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-
-                                mdelinebtn.setVisibility(View.INVISIBLE);
-                                mcurrent_state="no_friend";
-                                mSendbtn.setText("Send Friend Request");
-
-
-
-
-                            }
-                        });
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if(databaseError!=null){
+                            Toast.makeText(ProfileActivity.this,"error! restart app and try again!",Toast.LENGTH_LONG).show();
+                        }else {
+                            mdelinebtn.setVisibility(View.INVISIBLE);
+                            mcurrent_state="no_friend";
+                            mSendbtn.setText("Send Friend Request");
+                        }
                     }
                 });
             }
         });
     }
-
-
 }

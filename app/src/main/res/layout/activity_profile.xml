@@ -89,7 +89,7 @@
         android:layout_marginBottom="28dp"
         android:background="@color/colorAccent"
         android:elevation="0dp"
-        android:text="Deline friend request"
+        android:text="Decline friend request"
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"

@@ -55,7 +55,7 @@
             android:name=".UsersActivity"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ProfileActivity"
-            android:parentActivityName=".UsersActivity">
+           >
             <intent-filter>
                 <action android:name="com.allvoes.Luna_FRIEND_REQUEST_NOTIFICATION"/>
                 <category android:name="android.intent.category.DEFAULT"/>

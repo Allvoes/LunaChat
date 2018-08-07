@@ -9,28 +9,29 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class FirebaseMessagingService extends  com.google.firebase.messaging.FirebaseMessagingService {
+    private DatabaseReference mDatabase;
+    private FirebaseUser mAuth;
+
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
+
         String mNotifi_title = remoteMessage.getNotification().getTitle();
         String mNotifi_body = remoteMessage.getNotification().getBody();
         String click_action = remoteMessage.getNotification().getClickAction();
         String from_user_ID = remoteMessage.getData().get("from_user_id");
         sendNotification(mNotifi_title,mNotifi_body,click_action,from_user_ID);
 
-
-
-
-
-
-
-        /*
-
-        */
 
     }
 
@@ -39,6 +40,7 @@ public class FirebaseMessagingService extends  com.google.firebase.messaging.Fir
 
         Intent i = new Intent(click_action);
         i.putExtra("user_id",from_user_ID);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,i,PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

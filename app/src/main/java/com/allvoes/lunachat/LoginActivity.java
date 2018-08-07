@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                     } catch (FirebaseAuthInvalidCredentialsException e) {
                         error = "Invalid Password!";
                     } catch (Exception e) {
-                        error = "Default error!";
+                        error = "Check you connnection!";
                         e.printStackTrace();
                     }
                     mdialog.hide();
