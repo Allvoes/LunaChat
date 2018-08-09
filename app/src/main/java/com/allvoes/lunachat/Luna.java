@@ -20,6 +20,7 @@ public class Luna extends Application {
     private FirebaseAuth mAuth;
 
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -58,13 +59,8 @@ public class Luna extends Application {
                 }
             });
         }
-
-
-
-
-
-
     }
+
 
 
 

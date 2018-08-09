@@ -69,6 +69,12 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mDatabase.child("online").setValue("true");
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
 

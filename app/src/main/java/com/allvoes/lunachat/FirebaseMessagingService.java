@@ -39,7 +39,7 @@ public class FirebaseMessagingService extends  com.google.firebase.messaging.Fir
     public void sendNotification(String mNotifi_title,String mNotifi_body,String click_action, String from_user_ID){
 
         Intent i = new Intent(click_action);
-        i.putExtra("user_id",from_user_ID);
+        i.putExtra("from_user_id",from_user_ID);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,i,PendingIntent.FLAG_UPDATE_CURRENT);
 
