@@ -75,8 +75,6 @@ public class FriendFragment extends Fragment {
                 new FirebaseRecyclerOptions.Builder<Friend>()
                         .setQuery(mDatabase, Friend.class)
                         .build();
-
-
         FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Friend,FriendViewHolder>(options) {
 
             @NonNull
@@ -85,9 +83,7 @@ public class FriendFragment extends Fragment {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.user_single_layout, parent, false);
                 return new FriendViewHolder(view);
-
             }
-
             @Override
             protected void onBindViewHolder(@NonNull final FriendViewHolder holder, final int position, @NonNull Friend model) {
 
@@ -102,8 +98,6 @@ public class FriendFragment extends Fragment {
                             String online =(String) dataSnapshot.child("online").getValue().toString();
                             holder.Setuseronline(online);
                         }
-
-
                         holder.setName(name);
                         holder.setImage(thumb_img);
                         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -118,43 +112,30 @@ public class FriendFragment extends Fragment {
                                     public void onClick(DialogInterface dialog, int which) {
 
                                         if(which == 0){
-                                            Intent i = new Intent(getActivity(),ProfileActivity.class);
+                                            Intent i = new Intent(getActivity(),ChatActivity.class);
                                             i.putExtra( "user_id",list_friend);
+                                            i.putExtra("user_name",name);
+                                            i.putExtra("user_img",thumb_img);
                                             startActivity(i);
                                         }
                                         if(which == 1){
                                             Intent i = new Intent(getActivity(),ProfileActivity.class);
                                             i.putExtra( "user_id",list_friend);
-                                            i.putExtra("user_name",name);
-                                            i.putExtra("thumb_img",thumb_img);
                                             startActivity(i);
                                         }
                                     }
                                 });
                                 builder.show();
-
-
-
                             }
                         });
-
-
-
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
                 });
                 holder.setDate(model.getDate());
-
-
-
             }
-
-
-
         };
         mFriendList.setAdapter(adapter);
 

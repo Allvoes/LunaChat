@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 public class MainActivity extends AppCompatActivity implements ChatFragment.OnFragmentInteractionListener{
 
@@ -68,17 +69,14 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mDatabase.child("online").setValue("true");
-    }
+
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mDatabase.child("online").setValue("false");
+        mDatabase.child("online").setValue(ServerValue.TIMESTAMP);
+
 
     }
 

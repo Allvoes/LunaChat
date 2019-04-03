@@ -103,28 +103,26 @@ public class RegisterActivity extends AppCompatActivity {
 
                     FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
                     String uid = current_user.getUid();
+
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(uid);
+                    String device_token = FirebaseInstanceId.getInstance().getToken();
+
                     HashMap<String, String> usermap = new HashMap<>();
                     usermap.put("name", display_name);
                     usermap.put("status", "Hellon't");
                     usermap.put("image", "Default");
                     usermap.put("Thumb_image", "Default");
+                    usermap.put("TokenId", device_token);
 
                     mDatabase.setValue(usermap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            String device_token = FirebaseInstanceId.getInstance().getToken();
-                            String uid = FirebaseAuth.getInstance().getUid();
-                            mdatabase.child(uid).child("TokenId").setValue(device_token).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    mdialog.dismiss();
-                                    Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                                    thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(thisIntent);
-                                    finish();
-                                }
-                            });
+
+                            mdialog.dismiss();
+                            Intent thisIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                            thisIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(thisIntent);
+                            finish();
 
                         }
                     });
