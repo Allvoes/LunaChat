@@ -16,6 +16,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity implements ChatFragment.OnFragmentInteractionListener{
 
     private FirebaseAuth mAuth;
@@ -38,9 +40,8 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
         if(currentUser == null){
             send_to_start();
         }else {
-            mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(mAuth.getCurrentUser().getUid());
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(currentUser.getUid());
         }
-
 
         mtoolbar = (Toolbar)findViewById(R.id.main_toolbar);
         setSupportActionBar(mtoolbar);
@@ -63,21 +64,20 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
     @Override
     protected void onStart() {
         super.onStart();
-
-        mDatabase.child("online").setValue("true");
-
-
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser == null){
+            send_to_start();
+        }else{
+            mDatabase.child("online").setValue("true");
+        }
     }
 
-
-
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+
 
         mDatabase.child("online").setValue(ServerValue.TIMESTAMP);
-
-
     }
 
     private void send_to_start() {
@@ -102,27 +102,25 @@ public class MainActivity extends AppCompatActivity implements ChatFragment.OnFr
 
         if(item.getItemId()== R.id.btn_log_out){
             FirebaseAuth.getInstance().signOut();
+            mDatabase.child("online").setValue(ServerValue.TIMESTAMP);
             send_to_start();
         }
         if (item.getItemId()== R.id.Main_setting){
             Intent i = new Intent(MainActivity.this,SettingsActivity.class);
             startActivity(i);
-
         }
-
         if (item.getItemId()== R.id.Main_all_btn){
             Intent i = new Intent(MainActivity.this,UsersActivity.class);
             startActivity(i);
-
         }
-
         return true;
+    }
 
+    public void isseen (){
 
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        
-    }
+
+
+
 }

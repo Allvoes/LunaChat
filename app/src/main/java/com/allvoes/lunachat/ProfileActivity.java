@@ -23,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -40,10 +41,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     private String mcurrent_state;
 
-    private DatabaseReference mFriendrequest,mUserDatabase,mFriends,mCloudMess,mRootRef;
+    private DatabaseReference mFriendrequest,mUserDatabase,mFriends,mCloudMess,mRootRef,mDatabase;
     private FirebaseAuth mAuth;
     private ProgressDialog mdialog;
     private FirebaseUser mUid;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +73,15 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
+        mRootRef = FirebaseDatabase.getInstance().getReference();
         mUid = FirebaseAuth.getInstance().getCurrentUser();
 
-        mRootRef = FirebaseDatabase.getInstance().getReference();
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("User").child(user_uid);
-        mFriendrequest = FirebaseDatabase.getInstance().getReference().child("friend_ref");
-        mFriends = FirebaseDatabase.getInstance().getReference().child("Friend");
-        mCloudMess = FirebaseDatabase.getInstance().getReference().child("notifications");
+        mDatabase = mRootRef.child("User").child(mUid.getUid());
+
+        mUserDatabase = mRootRef.child("User").child(user_uid);
+        mFriendrequest = mRootRef.child("friend_ref");
+        mFriends = mRootRef.child("Friend");
+        mCloudMess = mRootRef.child("notifications");
 
 
         mdialog = new ProgressDialog(this);
@@ -308,5 +312,17 @@ public class ProfileActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mDatabase.child("online").setValue("true");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDatabase.child("online").setValue(ServerValue.TIMESTAMP);
     }
 }

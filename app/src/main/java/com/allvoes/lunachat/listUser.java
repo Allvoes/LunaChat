@@ -1,20 +1,13 @@
 package com.allvoes.lunachat;
 
-public class User {
+public class listUser {
     private String name;
     private String status;
     private String image;
     private String Thumb_image;
 
-    public User(){
 
-    }
-
-    public User(String name, String status, String image, String Thumb_image) {
-        this.name = name;
-        this.status = status;
-        this.image = image;
-        this.Thumb_image = Thumb_image;
+    public listUser() {
     }
 
     public String getName() {
@@ -48,4 +41,5 @@ public class User {
     public void setThumb_image(String thumb_image) {
         Thumb_image = thumb_image;
     }
+
 }

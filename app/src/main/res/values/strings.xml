@@ -14,4 +14,5 @@
     <string name="default_status">Some thing stupit</string>
     <string name="channel_description">notification</string>
     <string name="channel_name">Channel human readable title</string>
+    <string name="daxe">seen</string>
 </resources>

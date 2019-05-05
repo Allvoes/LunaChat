@@ -31,7 +31,7 @@ public class Luna extends Application {
         Picasso.Builder B = new Picasso.Builder(this);
         B.downloader(new OkHttp3Downloader(this,Integer.MAX_VALUE));
         Picasso b = B.build();
-        b.setIndicatorsEnabled(true);
+        b.setIndicatorsEnabled(false);
         b.setLoggingEnabled(true);
         Picasso.setSingletonInstance(b);
 
@@ -44,25 +44,13 @@ public class Luna extends Application {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot != null){
-
                         mDatabase.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
-
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 }
             });
         }
     }
-
-
-
-
-
-
-
-
 }

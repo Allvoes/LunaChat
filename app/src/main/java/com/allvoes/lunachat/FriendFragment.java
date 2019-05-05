@@ -1,12 +1,12 @@
 package com.allvoes.lunachat;
 
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -103,8 +103,7 @@ public class FriendFragment extends Fragment {
                         holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-
-                                CharSequence options[] = new CharSequence[]{"Send Messgasing","Open Profile"};
+                                CharSequence options[] = new CharSequence[]{"Send Messgasing","Open Profile","Gallery"};
                                 AlertDialog.Builder  builder = new AlertDialog.Builder(getContext());
                                 builder.setTitle("Select Options");
                                 builder.setItems(options, new DialogInterface.OnClickListener() {
@@ -138,9 +137,7 @@ public class FriendFragment extends Fragment {
             }
         };
         mFriendList.setAdapter(adapter);
-
         adapter.startListening();
-
     }
 
 
@@ -150,17 +147,12 @@ public class FriendFragment extends Fragment {
         public FriendViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
-
-
         }
 
         public void setName(String name) {
             TextView usernameview = (TextView) mView.findViewById(R.id.user_single_name);
             usernameview.setText(name);
-
-
         }
-
 
         public void setImage(final String image) {
 
@@ -170,20 +162,18 @@ public class FriendFragment extends Fragment {
                 public void onSuccess() {
                     Picasso.get().load(image).placeholder(R.drawable.default_avatar).into(m);
                 }
-
                 @Override
                 public void onError(Exception e) {
-
                     Picasso.get().load(image).placeholder(R.drawable.default_avatar).into(m);
                 }
             });
-
         }
 
         public void  setDate(String date) {
             TextView usernameview = (TextView) mView.findViewById(R.id.user_single_status);
             usernameview.setText(date);
         }
+
         public void Setuseronline(String online){
             CircleImageView online_status = (CircleImageView) mView.findViewById(R.id.online);
             if(online.equals("true")){
@@ -193,8 +183,4 @@ public class FriendFragment extends Fragment {
             }
         }
     }
-
-
-
-
 }

@@ -1,5 +1,6 @@
 package com.allvoes.lunachat;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -57,6 +59,8 @@ public class SettingsActivity extends AppCompatActivity {
     private ProgressDialog mdialog;
 
     private  static final int GALARY_PICK = 1;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,26 +137,36 @@ public class SettingsActivity extends AppCompatActivity {
         mChangeimg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(),GalleryActivity.class);
+                startActivityForResult(i,1);
 
-                Intent i = new Intent();
-                i.setType("image/*");
-                i.setAction(Intent.ACTION_GET_CONTENT);
-
-                startActivityForResult(i.createChooser(i,"Select Image"),GALARY_PICK);
-
+//                Intent i = new Intent();
+//                i.setType("image/*");
+//                i.setAction(Intent.ACTION_GET_CONTENT);
+//
+//                startActivityForResult(i.createChooser(i,"Select Image"),GALARY_PICK);
             }
         });
-
-
-
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mDatabase.child("online").setValue("true");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDatabase.child("online").setValue(ServerValue.TIMESTAMP);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GALARY_PICK && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
 
-            Uri imageUri = data.getData();
+            String result= data.getStringExtra("result");
+            Uri imageUri = Uri.parse(result);
             CropImage.activity(imageUri)
                     .setAspectRatio(1,1)
                     .start(this);
@@ -237,9 +251,4 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
-
-
 }
